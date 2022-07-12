@@ -6,7 +6,6 @@ from setuptools import find_packages, setup
 
 from pretix_gtm import __version__
 
-
 try:
     with open(
         os.path.join(os.path.dirname(__file__), "README.rst"), encoding="utf-8"
@@ -15,22 +14,19 @@ try:
 except Exception:
     long_description = ""
 
-
 class CustomBuild(build):
     def run(self):
         management.call_command("compilemessages", verbosity=1)
         build.run(self)
 
-
 cmdclass = {"build": CustomBuild}
 
-
 setup(
-    name="pretix-googletagmanager",
+    name="pretix-gtm",
     version=__version__,
-    description="Provides support for Google Tag Manager.",
+    description="This plugin provides support for Google Tag Manager.",
     long_description=long_description,
-    url="https://github.com/savvystack/pretix-googletagmanager",
+    url="https://github.com/savvystack/pretix-gtm",
     author="Raymond Jia",
     author_email="raymond@savvystack.com",
     license="Apache",

@@ -1,9 +1,15 @@
 Google Tag Manager
 ==========================
 
-This is a plugin for `pretix`_. 
+This is a plugin for `pretix`_. It adds Google Tag Manager support to the pretix storefront.
 
-Provides support for Google Tag Manager.
+This plugin is still work in progress. It won't work for your site, because:
+
+- It is not configurable (yet)
+- It is hard-coded with one of my own GTM tracking IDs (duh!)
+
+So, stay tuned.
+
 
 Development setup
 -----------------
