@@ -1,14 +1,11 @@
 import logging
-
 from django.dispatch import receiver
 from django.urls import resolve, reverse
-from django.utils.translation import gettext_lazy as _, gettext, get_language
-
+from django.utils.translation import get_language, gettext, gettext_lazy as _
+from pretix.base.middleware import _merge_csp, _parse_csp, _render_csp
 from pretix.base.models import Event
 from pretix.control.signals import nav_event_settings
 from pretix.presale.signals import html_head, html_page_header, process_response
-
-from pretix.base.middleware import _parse_csp, _render_csp, _merge_csp
 
 logger = logging.getLogger(__name__)
 
@@ -31,112 +28,134 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 """
 
-GTM_CSP_BASE = {
-}
-
-GTM_CSP_GA4 = {
-
-}
-
 GTM_CSP_DIRECTIVES = {
-    'gtm_container_id': {
-        'script-src': ["'unsafe-inline'", 'https://www.googletagmanager.com'],
-        'img-src': ['www.googletagmanager.com'],
+    "gtm_container_id": {
+        "script-src": ["'unsafe-inline'", "https://www.googletagmanager.com"],
+        "img-src": ["www.googletagmanager.com"],
     },
-    'gtm_custom_js_variables': {
-          'script-src': ["'unsafe-eval'"],
+    "gtm_custom_js_variables": {
+        "script-src": ["'unsafe-eval'"],
     },
-    'gtm_preview_mode': {
-        'script-src': ['https://tagmanager.google.com'],
-        'style-src': ['https://tagmanager.google.com', 'https://fonts.googleapis.com'],
-        'img-src': ['https://ssl.gstatic.com', 'https://www.gstatic.com'],
-        'font-src': ['https://fonts.gstatic.com', 'data:'],
+    "gtm_preview_mode": {
+        "script-src": ["https://tagmanager.google.com"],
+        "style-src": ["https://tagmanager.google.com", "https://fonts.googleapis.com"],
+        "img-src": ["https://ssl.gstatic.com", "https://www.gstatic.com"],
+        "font-src": ["https://fonts.gstatic.com", "data:"],
     },
-    'gtm_tag_ga4': {
-        'script-src': ['*.googletagmanager.com'],
-        'img-src': ['*.google-analytics.com', '*.googletagmanager.com'],
-        'connect-src': ['*.google-analytics.com', '*.analytics.google.com', '*.googletagmanager.com'],
+    "gtm_tag_ga4": {
+        "script-src": ["*.googletagmanager.com"],
+        "img-src": ["*.google-analytics.com", "*.googletagmanager.com"],
+        "connect-src": [
+            "*.google-analytics.com",
+            "*.analytics.google.com",
+            "*.googletagmanager.com",
+        ],
     },
-    'gtm_tag_ua': {
-        'script-src': ['https://www.google-analytics.com', 'https://ssl.google-analytics.com'],
-        'img-src': ['https://www.google-analytics.com'],
-        'connect-src': ['https://www.google-analytics.com'],
+    "gtm_tag_ua": {
+        "script-src": [
+            "https://www.google-analytics.com",
+            "https://ssl.google-analytics.com",
+        ],
+        "img-src": ["https://www.google-analytics.com"],
+        "connect-src": ["https://www.google-analytics.com"],
     },
-    'gtm_tag_google_optimize': {
-        'script-src': ['https://www.google-analytics.com'],
+    "gtm_tag_google_optimize": {
+        "script-src": ["https://www.google-analytics.com"],
     },
-    'gtm_tag_google_ads_conversion': {
-        'script-src': ['https://www.googleadservices.com', 'https://www.google.com'],
-        'img-src': ['https://googleads.g.doubleclick.net', 'https://www.google.com'],
+    "gtm_tag_google_ads_conversion": {
+        "script-src": ["https://www.googleadservices.com", "https://www.google.com"],
+        "img-src": ["https://googleads.g.doubleclick.net", "https://www.google.com"],
     },
-    'gtm_tag_google_ads_remarketing': {
-        'script-src': ['https://www.googleadservices.com', 'https://googleads.g.doubleclick.net', 'https://www.google.com'],
-        'img-src': ['https://www.google.com'],
-        'frame-src': ['https://bid.g.doubleclick.net'],
+    "gtm_tag_google_ads_remarketing": {
+        "script-src": [
+            "https://www.googleadservices.com",
+            "https://googleads.g.doubleclick.net",
+            "https://www.google.com",
+        ],
+        "img-src": ["https://www.google.com"],
+        "frame-src": ["https://bid.g.doubleclick.net"],
     },
-    'gtm_floodlight_config_id': {
-        'img-src': ['https://{floodlight_config_id}.fls.doubleclick.net', 'https://ad.doubleclick.net', 'https://ade.googlesyndication.com'],
-        'frame-src': ['https://{floodlight_config_id}.fls.doubleclick.net'],
-    }
+    "gtm_floodlight_config_id": {
+        "img-src": [
+            "https://{floodlight_config_id}.fls.doubleclick.net",
+            "https://ad.doubleclick.net",
+            "https://ade.googlesyndication.com",
+        ],
+        "frame-src": ["https://{floodlight_config_id}.fls.doubleclick.net"],
+    },
 }
 
-@receiver(nav_event_settings, dispatch_uid='gtm_nav_settings')
+
+@receiver(nav_event_settings, dispatch_uid="gtm_nav_settings")
 def navbar_settings(sender, request, **kwargs):
     url = resolve(request.path_info)
-    return [{
-        'label': _('Tag Manager'),
-        'url': reverse('plugins:pretix_gtm:settings', kwargs={
-            'event': request.event.slug,
-            'organizer': request.organizer.slug,
-        }),
-        'active': url.namespace == 'plugins:pretix_gtm' and url.url_name.startswith('settings'),
-    }]
+    return [
+        {
+            "label": _("Tag Manager"),
+            "url": reverse(
+                "plugins:pretix_gtm:settings",
+                kwargs={
+                    "event": request.event.slug,
+                    "organizer": request.organizer.slug,
+                },
+            ),
+            "active": url.namespace == "plugins:pretix_gtm"
+            and url.url_name.startswith("settings"),
+        }
+    ]
 
 
 @receiver(html_head, dispatch_uid="gtm_html_head")
 def html_head(sender: Event, **kwargs):
-    container_id = sender.settings.get('gtm_container_id')
-    logger.info(container_id)
+    container_id = sender.settings.get("gtm_container_id")
     if container_id:
-      return GTM_SNIPPET_HEAD1 + container_id + GTM_SNIPPET_HEAD2
+        return GTM_SNIPPET_HEAD1 + container_id + GTM_SNIPPET_HEAD2
 
 
 @receiver(html_page_header, dispatch_uid="gtm_html_page_header")
 def html_page_header(sender: Event, **kwargs):
-    container_id = sender.settings.get('gtm_container_id')
+    container_id = sender.settings.get("gtm_container_id")
     logger.info(container_id)
     if container_id:
-      return GTM_SNIPPET_BODY.format(container_id)
+        return GTM_SNIPPET_BODY.format(container_id)
 
 
 @receiver(process_response, dispatch_uid="gtm_process_response")
 def process_response(sender: Event, request, response, **kwargs):
     # response['Content-Security-Policy'] = "script-src 'unsafe-inline' https://www.googletagmanager.com *.googletagmanager.com; img-src www.googletagmanager.com *.google-analytics.com *.googletagmanager.com; connect-src *.google-analytics.com *.analytics.google.com *.googletagmanager.com"
 
-    features = ['gtm_tag_ga4', 'gtm_tag_ua', 'gtm_tag_google_optimize', 'gtm_tag_google_ads_conversion', 'gtm_tag_google_ads_remarketing', 'gtm_custom_js_variables', 'gtm_preview_mode']
+    features = [
+        "gtm_tag_ga4",
+        "gtm_tag_ua",
+        "gtm_tag_google_optimize",
+        "gtm_tag_google_ads_conversion",
+        "gtm_tag_google_ads_remarketing",
+        "gtm_custom_js_variables",
+        "gtm_preview_mode",
+    ]
     h = {}
-    if sender.settings.get('gtm_container_id'):
-        _merge_csp(h, GTM_CSP_DIRECTIVES['gtm_container_id'])
-        
+    if sender.settings.get("gtm_container_id"):
+        _merge_csp(h, GTM_CSP_DIRECTIVES["gtm_container_id"])
+
         for feature in features:
             if sender.settings.get(feature, as_type=bool, default=False):
                 _merge_csp(h, GTM_CSP_DIRECTIVES[feature])
-        
-        floodlight_config_id = sender.settings.get('gtm_floodlight_config_id')
+
+        floodlight_config_id = sender.settings.get("gtm_floodlight_config_id")
         if floodlight_config_id:
             fld = {}
-            for key, values in GTM_CSP_DIRECTIVES['gtm_floodlight_config_id'].items():
+            for key, values in GTM_CSP_DIRECTIVES["gtm_floodlight_config_id"].items():
                 logger.info(key)
                 logger.info(values)
-                fld[key] = [v.format(floodlight_config_id=floodlight_config_id) for v in values]
+                fld[key] = [
+                    v.format(floodlight_config_id=floodlight_config_id) for v in values
+                ]
             _merge_csp(h, fld)
 
-        custom_directives = sender.settings.get('gtm_custom_csp_header')
+        custom_directives = sender.settings.get("gtm_custom_csp_header")
         if custom_directives:
             _merge_csp(h, _parse_csp(custom_directives))
 
-        response['Content-Security-Policy'] = _render_csp(h)
-
-    logger.info(response['Content-Security-Policy'])
+        response["Content-Security-Policy"] = _render_csp(h)
 
     return response
