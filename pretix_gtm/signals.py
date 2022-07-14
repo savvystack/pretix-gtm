@@ -1,7 +1,7 @@
 import logging
 from django.dispatch import receiver
 from django.urls import resolve, reverse
-from django.utils.translation import get_language, gettext, gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from pretix.base.middleware import _merge_csp, _parse_csp, _render_csp
 from pretix.base.models import Event
 from pretix.control.signals import nav_event_settings
@@ -18,7 +18,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','"""
 
 GTM_SNIPPET_HEAD2 = """');</script>
-<!-- End Google Tag Manager -->  
+<!-- End Google Tag Manager -->
 """
 
 GTM_SNIPPET_BODY = """
@@ -122,8 +122,6 @@ def html_page_header(sender: Event, **kwargs):
 
 @receiver(process_response, dispatch_uid="gtm_process_response")
 def process_response(sender: Event, request, response, **kwargs):
-    # response['Content-Security-Policy'] = "script-src 'unsafe-inline' https://www.googletagmanager.com *.googletagmanager.com; img-src www.googletagmanager.com *.google-analytics.com *.googletagmanager.com; connect-src *.google-analytics.com *.analytics.google.com *.googletagmanager.com"
-
     features = [
         "gtm_tag_ga4",
         "gtm_tag_ua",
