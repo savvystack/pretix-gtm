@@ -1,0 +1,51 @@
+{% extends "pretixcontrol/event/settings_base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block inside %}
+    <h1>{% trans "Google Tag Manager" %}</h1>
+    <form action="" method="post" class="form-horizontal" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form_errors form %}
+        <fieldset>
+            <legend>{% trans "Container" %}</legend>
+            {% bootstrap_field form.gtm_container_id layout="control" %}
+            <p>
+              {% trans "Pretix uses HTTP Content-Security-Policy (CSP) header to control what scripts the browser can execute and what other types of resources it can load. Make sure you enable the features/tags below to match what you use on Google Tag Manager." %}
+              <a href="https://developers.google.com/tag-platform/tag-manager/web/csp"><span class="fa fa-info-circle" aria-hidden="true"></span> {% trans "More info" %}</a>
+            </p>
+        </fieldset>
+        <br/>
+        <fieldset>
+            <legend>{% trans "Tags" %}</legend>
+            {% bootstrap_field form.gtm_tag_ga4 layout="control" %}
+            {% bootstrap_field form.gtm_tag_ua layout="control" %}
+            {% bootstrap_field form.gtm_tag_google_optimize layout="control" %}
+            {% bootstrap_field form.gtm_tag_google_ads_conversion layout="control" %}
+            {% bootstrap_field form.gtm_tag_google_ads_remarketing layout="control" %}
+        </fieldset>
+        <br/>
+        <fieldset>
+            <legend>{% trans "Floodlight" %}</legend>
+            {% bootstrap_field form.gtm_floodlight_config_id layout="control" %}
+        </fieldset>
+        <br/>
+        <fieldset>
+            <legend>{% trans "Features" %}</legend>
+            {% bootstrap_field form.gtm_custom_js_variables layout="control" %}
+            {% bootstrap_field form.gtm_preview_mode layout="control" %}
+        </fieldset>
+        <br/>
+        <fieldset>
+            <legend>{% trans "Custom CSP Directives" %}</legend>
+            <p>
+              {% trans "If you use tags and/or features not listed above, you might still need to add additional directives to the CSP header. Please consult Google Tag Manager documentation for the specific requirements." %}
+            </p>
+            {% bootstrap_field form.gtm_custom_csp_header layout="control" %}
+        </fieldset>
+      <div class="form-group submit-group">
+            <button type="submit" class="btn btn-primary btn-save">
+                {% trans "Save" %}
+            </button>
+        </div>
+    </form>
+{% endblock %}
