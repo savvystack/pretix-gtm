@@ -115,7 +115,6 @@ def html_head(sender: Event, **kwargs):
 @receiver(html_page_header, dispatch_uid="gtm_html_page_header")
 def html_page_header(sender: Event, **kwargs):
     container_id = sender.settings.get("gtm_container_id")
-    logger.info(container_id)
     if container_id:
         return GTM_SNIPPET_BODY.format(container_id)
 
@@ -143,8 +142,6 @@ def process_response(sender: Event, request, response, **kwargs):
         if floodlight_config_id:
             fld = {}
             for key, values in GTM_CSP_DIRECTIVES["gtm_floodlight_config_id"].items():
-                logger.info(key)
-                logger.info(values)
                 fld[key] = [
                     v.format(floodlight_config_id=floodlight_config_id) for v in values
                 ]
