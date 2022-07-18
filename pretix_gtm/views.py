@@ -37,7 +37,7 @@ class TagManagerSettingsForm(SettingsForm):
     gtm_custom_csp_header = forms.CharField(
         label=_("Directives"),
         help_text=_(
-            "Use space to separate key and value, use semicolon to separate each directive, don't include quotes."
+            "Use space to separate keys and values, use semicolon to separate each directive. Don't use colons after keys. Don't quote URL values."
         ),
         required=False,
     )
