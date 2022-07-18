@@ -3,16 +3,50 @@ Google Tag Manager
 
 This is a plugin for `pretix`_. It adds Google Tag Manager support to the pretix storefront.
 
-This plugin is still work in progress. It won't work for your site, because:
+Experiment with it
+------------------
 
-- It is not configurable (yet)
-- It is hard-coded with one of my own GTM tracking IDs (duh!)
+Once installed, you can enable "Google Tag Manager" on a per event basis. Once enabled, you'll see the "Tag Manager" nav link under Event Settings:
 
-So, stay tuned.
+.. image:: docs/assets/screenshot-gtm-settings.png
+   :width: 1000px
+
+Enter your Container ID, refresh your storefront, you should be able to find the Google Tag Manager snnipet with your container ID in the ``<head>`` portion of the HTML.
+
+.. image:: docs/assets/screenshot-gtm-snippet.png
+   :width: 1000px
+
+If you aren't receiving tracking events from the tag you added on GTM, check the ``console`` tab for CSP (Content Security Policy) errors:
+
+.. image:: docs/assets/screenshot-csp-error.png
+   :width: 800px
+
+
+Caveats
+-------
+
+This plugin is still work in progress. Here are the top priorities on my to-do list:
+
+1. Review any user specific information sent to the tracking services.
+2. Implement mechanism to bypass tracking if the user chooses to opt-out.
+3. Add custom events to track the checkout flow with better accuracy.
+
+Given the status of this project, it might *not* be suited for production, depending on your local laws and regulations.
+
+So stay tuned.
+
+
+Compared to "Tracking codes"
+----------------------------
+
+This plugin is by no means a replacement to the `Tracking Codes plugin <https://marketplace.pretix.eu/products/tracking/>`_ by rami.io and Raphael Michel. 
+Please take a look and seriously consider supporting Raphael and his team.
 
 
 Development setup
 -----------------
+
+If you'd like to fork this project and add tracking events specific to your needs, please follow the following steps to set up your development environment.
 
 1. Make sure that you have a working `pretix development setup`_.
 
@@ -51,7 +85,7 @@ License
 -------
 
 
-Copyright 2022 Raymond Jia
+Copyright 2022 Savvy Stack, Inc.
 
 Released under the terms of the Apache License 2.0
 
